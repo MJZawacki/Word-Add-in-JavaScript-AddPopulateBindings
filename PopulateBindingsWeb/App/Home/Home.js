@@ -39,13 +39,24 @@
                         myXML = myOOXMLRequest.responseText;
                     }
                     Office.context.document.setSelectedDataAsync(myXML, { coercionType: 'ooxml' }, function (result) {
-                        Office.context.document.bindings.addFromNamedItemAsync("MyContentControlTitle", "text", { id: 'myBinding' });
+                        Office.context.document.bindings.addFromNamedItemAsync("MyContentControlTitle", "text", { id: 'myBinding' }, function (bindingresult) {
+
+                            bindingresult.value.addHandlerAsync(Office.EventType.BindingSelectionChanged, onBindingSelectionChanged, function (eventresult) {
+                                console.log("binding add selected event result - " + eventresult.status + " : " + eventresult.value);
+                            });
+
+                        });
                     });
                 }
                 else app.showNotification(result.error.name + " " + result.error.code, result.error.message);
             }
         });
-    }
+    };
+
+    function onBindingSelectionChanged(eventArgs) {
+ 
+        console.log("binding selected: " + eventArgs.binding.id);
+    };
 
     // Add content at bound location.
     function populateBinding(filename) {
